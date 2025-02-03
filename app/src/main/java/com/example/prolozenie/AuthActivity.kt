@@ -14,35 +14,40 @@ import androidx.core.view.WindowInsetsCompat
 class AuthActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_auth)
+        setContentView(R.layout.activity_main)
 
-        val userLogin: EditText = findViewById(R.id.user_login_auth)
-        val userPass: EditText = findViewById(R.id.user_pass_auth)
-        val button: Button = findViewById(R.id.button_auth)
-        val linkToReg: TextView = findViewById(R.id.link_to_reg)
+        val userLogin: EditText = findViewById(R.id.user_login)
+        val userEmail: EditText = findViewById(R.id.user_email)
+        val userPass: EditText = findViewById(R.id.user_pass)
+        val button: Button = findViewById(R.id.button_reg)
+        val linkToAuth: TextView = findViewById(R.id.link_to_auth)
 
-        linkToReg.setOnClickListener {
+        linkToAuth.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
 
         button.setOnClickListener {
             val login = userLogin.text.toString().trim()
+            val email = userEmail.text.toString().trim()
             val pass = userPass.text.toString().trim()
 
-            if (login == "" || pass == "")
+            if (login == "" || email == "" || pass == "")
                 Toast.makeText(this, "Не все поля заполнены!", Toast.LENGTH_LONG).show()
             else {
-                val db = DbHelper(this, null)
-                val isAuth = db.getUser(login, pass)
+                val user = User(login, email, pass)
 
-                if (isAuth){
-                    Toast.makeText(this, "Пользователь $login авторизован", Toast.LENGTH_LONG).show()
-                    userLogin.text.clear()
-                    userPass.text.clear()
-                } else{
-                    Toast.makeText(this, "Пользователь $login не авторизован", Toast.LENGTH_LONG).show()
-                }
+                val db = DbHelper(this, null)
+                db.addUser(user)
+                Toast.makeText(this, "Пользователь $login добавлен", Toast.LENGTH_LONG).show()
+
+                userLogin.text.clear()
+                userEmail.text.clear()
+                userPass.text.clear()
+
+
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
             }
         }
     }
